@@ -2,104 +2,62 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Рестораны рядом</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Тест геолокации</title>
   <style>
     body {
-      margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: linear-gradient(135deg, #f0f4ff, #e3e9ff);
+      background: linear-gradient(120deg, #f0f4ff, #e0e7ff);
+      height: 100vh;
+      margin: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      color: #333;
       text-align: center;
-      color: #222;
-      padding: 20px;
     }
-
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    p {
-      font-size: 16px;
-      margin-bottom: 20px;
-    }
-
     button {
-      padding: 12px 24px;
-      font-size: 16px;
-      border: none;
-      border-radius: 12px;
       background-color: #007aff;
       color: white;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      border: none;
+      border-radius: 12px;
+      padding: 14px 28px;
+      font-size: 18px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: background-color 0.3s ease;
     }
-
     button:hover {
       background-color: #005edb;
-    }
-
-    .error {
-      margin-top: 20px;
-      color: red;
-      font-weight: 500;
-    }
-
-    .success {
-      margin-top: 20px;
-      color: green;
-      font-weight: 500;
     }
   </style>
 </head>
 <body>
-  <h1>🔍 Поиск ресторанов рядом</h1>
-  <p>Нажми на кнопку ниже, чтобы отправить свою геолокацию</p>
-  <button onclick="sendLocation()">Разрешить геолокацию</button>
-
-  <div id="result"></div>
+  <h1>🔍 Тест отправки геолокации</h1>
+  <button onclick="sendLocation()">Отправить геолокацию</button>
 
   <script>
     function sendLocation() {
-      const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = "";
-
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            fetch("https://script.google.com/macros/s/AKfycbz1KW6ygLrrtoBHBx-V1OXMjXlAlLln5Zk97vpjT_WWhF4eNz4ZW30bvYYCtnvt67yf/exec", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude,
-              }),
-            })
-              .then((response) => response.text())
-              .then((data) => {
-                resultDiv.innerHTML = `<div class="success">Геолокация отправлена!</div>`;
-              })
-              .catch((error) => {
-                resultDiv.innerHTML = `<div class="error">Ошибка при отправке: ${error}</div>`;
-                console.log("Ошибка при fetch:", error);
-              });
-          },
-          (error) => {
-            resultDiv.innerHTML = `<div class="error">Ошибка геолокации: ${error.message}</div>`;
-            console.log("Ошибка геолокации:", error);
-          }
-        );
-      } else {
-        resultDiv.innerHTML = `<div class="error">Геолокация не поддерживается на этом устройстве.</div>`;
+      if (!navigator.geolocation) {
+        alert('Геолокация не поддерживается вашим браузером');
+        return;
       }
+      navigator.geolocation.getCurrentPosition(position => {
+        fetch('https://script.google.com/macros/s/AKfycbzlAxrsiWSfRQjNBVShlE_1Pbjw_sqQbLhnKhkW2QOU1qEQaLlRGs1aNVfAsrdfdHAI/exec', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          })
+        })
+        .then(response => response.text())
+        .then(data => alert('Координаты отправлены!'))
+        .catch(err => alert('Ошибка отправки: ' + err));
+      }, err => alert('Ошибка геолокации: ' + err.message));
     }
   </script>
 </body>
