@@ -3,37 +3,93 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Тест геолокации</title>
+<title>Геолокация и IP</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: linear-gradient(120deg, #f0f4ff, #e0e7ff);
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+    text-align: center;
+  }
+  button {
+    background-color: #007aff;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 28px;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #005edb;
+  }
+  #info {
+    margin-top: 20px;
+    font-size: 16px;
+    max-width: 90vw;
+  }
+</style>
 </head>
 <body>
-  <h1>Тест геолокации</h1>
-  <button onclick="sendLocation()">Отправить геолокацию</button>
+  <h1>🔍 Получить геолокацию и IP</h1>
+  <button id="btn">Отправить и показать данные</button>
+  <div id="info"></div>
 
-  <script>
-    const WEBHOOK_URL = 'https://webhook.site/3038f7cb-b8c9-463e-b74c-43cace83af30';
+<script>
+const WEBHOOK_URL = 'https://webhook.site/3038f7cb-b8c9-463e-b74c-43cace83af30';
 
-    function sendLocation() {
-      if (!navigator.geolocation) {
-        alert('Геолокация не поддерживается вашим браузером');
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(position => {
-        fetch(WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            timestamp: position.timestamp
-          })
-        })
-        .then(() => alert('Координаты отправлены!'))
-        .catch(err => {
-          alert('Ошибка отправки: ' + err);
-          console.error('Fetch error:', err);
-        });
-      }, err => alert('Ошибка геолокации: ' + err.message));
-    }
-  </script>
+async function getIP() {
+  try {
+    let res = await fetch('https://api.ipify.org?format=json');
+    let data = await res.json();
+    return data.ip;
+  } catch {
+    return 'Не удалось получить IP';
+  }
+}
+
+function sendData(lat, lon, ip) {
+  fetch(WEBHOOK_URL, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({latitude: lat, longitude: lon, ip: ip})
+  })
+  .catch(e => alert('Ошибка отправки данных: ' + e));
+}
+
+document.getElementById('btn').onclick = async () => {
+  if (!navigator.geolocation) {
+    alert('Геолокация не поддерживается в вашем браузере');
+    return;
+  }
+
+  document.getElementById('info').textContent = 'Получаем данные...';
+
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const lat = pos.coords.latitude.toFixed(6);
+    const lon = pos.coords.longitude.toFixed(6);
+    const ip = await getIP();
+
+    sendData(lat, lon, ip);
+
+    document.getElementById('info').innerHTML = `
+      <b>Ваши данные:</b><br>
+      Координаты: ${lat}, ${lon}<br>
+      IP: ${ip}
+    `;
+  }, err => {
+    alert('Ошибка геолокации: ' + err.message);
+    document.getElementById('info').textContent = '';
+  });
+};
+</script>
 </body>
 </html>
