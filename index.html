@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Отправка геолокации</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Геолокация</title>
 </head>
 <body>
   <h2>Отправка геолокации</h2>
-  <button onclick="sendLocation()">📍 Отправить</button>
+  <button onclick="sendLocation()">Отправить координаты</button>
 
   <script>
     function sendLocation() {
@@ -18,21 +18,30 @@
 
       navigator.geolocation.getCurrentPosition(
         position => {
+          const data = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            timestamp: new Date().toISOString()
+          };
+
           fetch('https://webhook.site/3038f7cb-b8c9-463e-b74c-43cace83af30', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-              timestamp: new Date().toISOString()
-            })
+            body: JSON.stringify(data)
           })
-          .then(res => alert('✅ Координаты отправлены!'))
-          .catch(err => alert('Ошибка: ' + err));
+          .then(response => {
+            alert('Координаты отправлены!');
+          })
+          .catch(error => {
+            alert('Ошибка отправки: ' + error);
+          });
         },
-        err => alert('Ошибка геолокации: ' + err.message)
+        error => {
+          alert('Ошибка получения геолокации: ' + error.message);
+        }
       );
     }
   </script>
